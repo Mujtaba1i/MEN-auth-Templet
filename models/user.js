@@ -1,4 +1,8 @@
+// imports ======================================================================================
+
 const mongoose = require("mongoose");
+
+// Schema =======================================================================================
 
 const userSchema = new mongoose.Schema({
   username: {
@@ -11,6 +15,10 @@ const userSchema = new mongoose.Schema({
   },
 })
 
+// model creation =================================================================================
+
 const User = mongoose.model("User", userSchema);
+
+// exports ========================================================================================
 
 module.exports = User
