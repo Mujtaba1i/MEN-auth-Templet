@@ -58,7 +58,7 @@ app.get("/", async (req, res) => {
     res.render('index.ejs')
 })
 
-// auth Routes =======================================================================================
+// auth Routes
 app.use('/auth' , authCtrl)
 
 
