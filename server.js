@@ -7,7 +7,6 @@ const morgan = require("morgan")
 const methodOverride = require("method-override")
 const session = require('express-session')
 const {MongoStore} = require("connect-mongo")
-const User = require("./models/user")
 const isSignedIn = require("./middleware/isSignedIn")
 const passUserToView = require("./middleware/pass-user-to-view.js")
 const app = express()
@@ -53,14 +52,12 @@ catch(err){
 // Routes ============================================================================================
 
 // Public Routes
-
 app.get("/", async (req, res) => {
     res.render('index.ejs')
     
 })
 
 // auth Routes
-
 app.use('/auth' , authCtrl)
 
 
@@ -69,6 +66,9 @@ app.use(isSignedIn)
 app.get('/vip-lounge', async(req,res)=>{
     res.send('VIP PAGE')
 })
+
+
+
 
 
 
