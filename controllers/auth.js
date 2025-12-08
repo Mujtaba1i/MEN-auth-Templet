@@ -6,7 +6,7 @@ const session = require('express-session')
 const router = express.Router()
 const User = require('../models/user')
 
-// ===============================================================================================
+// GET ============================================================================================
 
 router.get('/sign-up', async (req, res) =>{
     res.render('auth/sign-up.ejs')
@@ -15,6 +15,8 @@ router.get('/sign-up', async (req, res) =>{
 router.get('/sign-in', async (req, res) =>{
     res.render('auth/sign-in.ejs')
 })
+
+// POST ===========================================================================================
 
 router.post('/sign-up', async(req,res)=>{
     // console.log(req.body)
@@ -34,6 +36,7 @@ router.post('/sign-up', async(req,res)=>{
 
     // encrypt the password 
     const hashedPassword = bcrypt.hashSync(password, 10)
+    // console.log(req.body)
     req.body.password = hashedPassword
     delete req.body.confirmPassword
 
@@ -43,6 +46,8 @@ router.post('/sign-up', async(req,res)=>{
     // if succeeds "Sign the user" and redirct it to page
     res.redirect('/auth/sign-in')
 })
+
+// ============================================
 
 router.post('/sign-in', async(req,res)=>{
     const {username, password} = req.body
