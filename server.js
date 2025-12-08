@@ -5,9 +5,11 @@ const express = require("express")
 const mongoose = require("mongoose")
 const morgan = require("morgan")
 const methodOverride = require("method-override")
-const User = require("./models/user")
 const session = require('express-session')
+const {MongoStore} = require("connect-mongo")
+const User = require("./models/user")
 const isSignedIn = require("./middleware/isSignedIn")
+const passUserToView = require("./middleware/pass-user-to-view.js")
 const app = express()
 const port = process.env.PORT ? process.env.PORT : "4000"
 
@@ -15,14 +17,21 @@ const port = process.env.PORT ? process.env.PORT : "4000"
 
 const authCtrl = require("./controllers/auth")
 
-// cookies ========================================================================================
+// cookies ===========================================================================================
 
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    })
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET,
+        resave: false,
+        saveUninitialized: true,
+        store: MongoStore.create({
+                mongoUrl: process.env.MONGODB_URI
+            })
+        })
 )
+// passing the user ==================================================================================
+
+app.use(passUserToView)
 
 // middleware ========================================================================================
 
@@ -46,10 +55,12 @@ catch(err){
 // Public Routes
 
 app.get("/", async (req, res) => {
-    const user = req.session.user
-    res.render('index.ejs', { user })
+    res.render('index.ejs')
     
 })
+
+// auth Routes
+
 app.use('/auth' , authCtrl)
 
 
@@ -58,6 +69,8 @@ app.use(isSignedIn)
 app.get('/vip-lounge', async(req,res)=>{
     res.send('VIP PAGE')
 })
+
+
 
 
 

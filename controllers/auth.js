@@ -16,8 +16,9 @@ router.get('/sign-in', async (req, res) =>{
 })
 
 router.get('/sign-out', async (req,res)=>{
-    req.session.destroy()
-    res.redirect('/')
+    req.session.destroy(()=> {
+        res.redirect('/')
+    })
 })
 
 // POST ===========================================================================================
@@ -54,7 +55,9 @@ router.post('/sign-up', async(req,res)=>{
     }
 
     // if succeeds "Sign the user" and redirct it to page
-    res.redirect('/')
+    req.session.save(()=>{
+        res.redirect('/')
+    })
 })
 
 // ============================================
@@ -82,7 +85,10 @@ router.post('/sign-in', async(req,res)=>{
             username: userInDatabase.username,
             _id: userInDatabase._id
         }
-        res.redirect("/")
+
+        req.session.save(()=>{
+            res.redirect('/')
+        })
     }
 
 })
