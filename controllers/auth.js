@@ -1,13 +1,71 @@
 // imports =======================================================================================
 
 const express = require('express')
+const bcrypt = require("bcrypt")
+const session = require('express-session')
 const router = express.Router()
+const User = require('../models/user')
 
 // ===============================================================================================
 
 router.get('/sign-up', async (req, res) =>{
-    // res.render('sign-up')
-    res.send('SIGN UP ROUTE')
+    res.render('auth/sign-up.ejs')
+})
+
+router.get('/sign-in', async (req, res) =>{
+    res.render('auth/sign-in.ejs')
+})
+
+router.post('/sign-up', async(req,res)=>{
+    // console.log(req.body)
+
+    const {username, password, confirmPassword} = req.body 
+    
+    // username is not taken
+    const userInDatabase = await User.findOne({ username })
+    if (userInDatabase){
+        res.send('Username or password is invalid')
+    }
+
+    // validate the posswords match
+    if (password !== confirmPassword){
+        res.send('Username or password is invalid')
+    }
+
+    // encrypt the password 
+    const hashedPassword = bcrypt.hashSync(password, 10)
+    req.body.password = hashedPassword
+    delete req.body.confirmPassword
+
+    // if the above matches, create account with the encrypted password
+    const user = await User.create(req.body);
+    
+    // if succeeds "Sign the user" and redirct it to page
+    res.redirect('/auth/sign-in')
+})
+
+router.post('/sign-in', async(req,res)=>{
+    const {username, password} = req.body
+
+    // try to find the username in DB is not exist redirect to the signup
+    const userInDatabase = await User.findOne({ username })
+
+    // if exist compare the password 
+    if (!userInDatabase){
+        res.send('Username or password is invalid')
+    }
+    
+    const validPassword  = bcrypt.compareSync(password, userInDatabase.password)
+    
+    if (!validPassword){
+        // if doesnt match throw an error
+        res.send('Username or password is invalid')
+    }
+    else{
+        // else continue with the login 
+        res.redirect('/')
+    }
+
 })
 
 // exports ========================================================================================

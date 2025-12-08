@@ -23,16 +23,22 @@ app.use('/auth' , authCtrl)
 
 // connecting to DB ==================================================================================
 
-mongoose.connect(process.env.MONGODB_URI);
-mongoose.connection.on("connected", () => console.log(`Connected to MongoDB ${mongoose.connection.name}`))
+try{
+    mongoose.connect(process.env.MONGODB_URI);
+    mongoose.connection.on("connected", () => console.log(`Connected to MongoDB: ${mongoose.connection.name}`))
+}
+catch(err){
+    console.log('Ran into an error: ' + err)
+}
 
 // ===============================================================================================
 
-// Public
+// Public Routes
 
 app.get("/", async (req, res) => res.render('index.ejs'))
 
-// Protected Route
+// Protected Routes
+
 
 
 
