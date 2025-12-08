@@ -12,7 +12,7 @@ const passUserToView = require("./middleware/pass-user-to-view.js")
 const app = express()
 const port = process.env.PORT ? process.env.PORT : "4000"
 
-// controller(s) ========================================================================================
+// controller(s) =====================================================================================
 
 const authCtrl = require("./controllers/auth")
 
@@ -86,5 +86,5 @@ app.get('/vip-lounge', async(req,res)=>{
 
 
 
-
+// listening =========================================================================================
 app.listen(port, () => console.log(`listening on port ${port}`))
