@@ -1,17 +1,27 @@
 // imports ===========================================================================================
 
+require("dotenv").config()
 const express = require("express")
 const mongoose = require("mongoose")
 const morgan = require("morgan")
 const methodOverride = require("method-override")
 const User = require("./models/user")
+const session = require('express-session')
 const app = express()
-const port = process.env.PORT ? process.env.PORT : "3000"
-require("dotenv").config()
+const port = process.env.PORT ? process.env.PORT : "4000"
 
 // controller ========================================================================================
 
 const authCtrl = require("./controllers/auth")
+
+// cookies ========================================================================================
+
+app.use(session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    })
+)
 
 // middleware ========================================================================================
 
@@ -35,11 +45,21 @@ catch(err){
 
 // Public Routes
 
-app.get("/", async (req, res) => res.render('index.ejs'))
+app.get("/", async (req, res) => {
+    const user = req.session.user
+    res.render('index.ejs', { user })
+
+})
 
 // Protected Routes
 
-
+app.get('/vip-lounge', async(req,res)=>{
+    if(req.session.user){
+    res.send(`Welcome to the party ${req.session.user.username}.`)
+    } else {
+    res.send("Sorry, no guests allowed.");
+  }
+})
 
 
 

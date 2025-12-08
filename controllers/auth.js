@@ -2,7 +2,6 @@
 
 const express = require('express')
 const bcrypt = require("bcrypt")
-const session = require('express-session')
 const router = express.Router()
 const User = require('../models/user')
 
@@ -16,6 +15,11 @@ router.get('/sign-in', async (req, res) =>{
     res.render('auth/sign-in.ejs')
 })
 
+router.get('/sign-out', async (req,res)=>{
+    req.session.destroy()
+    res.redirect('/')
+})
+
 // POST ===========================================================================================
 
 router.post('/sign-up', async(req,res)=>{
@@ -26,12 +30,12 @@ router.post('/sign-up', async(req,res)=>{
     // username is not taken
     const userInDatabase = await User.findOne({ username })
     if (userInDatabase){
-        res.send('Username or password is invalid')
+        return res.send('Username or password is invalid')
     }
 
     // validate the posswords match
     if (password !== confirmPassword){
-        res.send('Username or password is invalid')
+        return res.send('Username or password is invalid')
     }
 
     // encrypt the password 
@@ -43,8 +47,14 @@ router.post('/sign-up', async(req,res)=>{
     // if the above matches, create account with the encrypted password
     const user = await User.create(req.body);
     
+    // sign the user in
+    req.session.user = {
+        username: user.username,
+        _id: user._id
+    }
+
     // if succeeds "Sign the user" and redirct it to page
-    res.redirect('/auth/sign-in')
+    res.redirect('/')
 })
 
 // ============================================
@@ -57,18 +67,22 @@ router.post('/sign-in', async(req,res)=>{
 
     // if exist compare the password 
     if (!userInDatabase){
-        res.send('Username or password is invalid')
+        return res.send('Username or password is invalid')
     }
     
     const validPassword  = bcrypt.compareSync(password, userInDatabase.password)
     
     if (!validPassword){
         // if doesnt match throw an error
-        res.send('Username or password is invalid')
+        return res.send('Username or password is invalid')
     }
     else{
         // else continue with the login 
-        res.redirect('/')
+        req.session.user = {
+            username: userInDatabase.username,
+            _id: userInDatabase._id
+        }
+        res.redirect("/")
     }
 
 })
