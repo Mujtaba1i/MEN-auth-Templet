@@ -12,7 +12,7 @@ const passUserToView = require("./middleware/pass-user-to-view.js")
 const app = express()
 const port = process.env.PORT ? process.env.PORT : "4000"
 
-// controller ========================================================================================
+// controller(s) ========================================================================================
 
 const authCtrl = require("./controllers/auth")
 
@@ -28,9 +28,6 @@ app.use(
             })
         })
 )
-// passing the user ==================================================================================
-
-app.use(passUserToView)
 
 // middleware ========================================================================================
 
@@ -51,22 +48,25 @@ catch(err){
 
 // Routes ============================================================================================
 
-// Public Routes
+// Public Routes =====================================================================================
+
+// passing the user
+app.use(passUserToView)
+
+// homepage
 app.get("/", async (req, res) => {
     res.render('index.ejs')
-    
 })
 
-// auth Routes
+// auth Routes =======================================================================================
 app.use('/auth' , authCtrl)
 
 
-// Protected Routes
+// Protected Routes ==================================================================================
 app.use(isSignedIn)
 app.get('/vip-lounge', async(req,res)=>{
     res.send('VIP PAGE')
 })
-
 
 
 
