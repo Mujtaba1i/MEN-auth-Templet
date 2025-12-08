@@ -7,6 +7,7 @@ const morgan = require("morgan")
 const methodOverride = require("method-override")
 const User = require("./models/user")
 const session = require('express-session')
+const isSignedIn = require("./middleware/isSignedIn")
 const app = express()
 const port = process.env.PORT ? process.env.PORT : "4000"
 
@@ -29,7 +30,6 @@ app.use(express.static('public'))
 app.use(express.urlencoded({ extended: false }))
 app.use(methodOverride("_method"))
 app.use(morgan("dev"))
-app.use('/auth' , authCtrl)
 
 // connecting to DB ==================================================================================
 
@@ -48,19 +48,16 @@ catch(err){
 app.get("/", async (req, res) => {
     const user = req.session.user
     res.render('index.ejs', { user })
-
+    
 })
+app.use('/auth' , authCtrl)
+
 
 // Protected Routes
-
+app.use(isSignedIn)
 app.get('/vip-lounge', async(req,res)=>{
-    if(req.session.user){
-    res.send(`Welcome to the party ${req.session.user.username}.`)
-    } else {
-    res.send("Sorry, no guests allowed.");
-  }
+    res.send('VIP PAGE')
 })
-
 
 
 
